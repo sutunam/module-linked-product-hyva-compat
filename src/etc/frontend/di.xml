@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author    Sutunam
+ * @copyright Copyright (c) 2024 Sutunam (http://www.sutunam.com/)
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Hyva\CompatModuleFallback\Model\CompatModuleRegistry">
+        <arguments>
+            <argument name="compatModules" xsi:type="array">
+                <item name="linked_product_module_map" xsi:type="array">
+                    <item name="original_module" xsi:type="string">Sutunam_LinkedProduct</item>
+                    <item name="compat_module" xsi:type="string">Sutunam_HyvaLinkedProduct</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Hyva\Theme\ViewModel\Slider">
+        <plugin name="sutunam_hyva_linked_product_get_slider_for_items"
+                type="Sutunam\HyvaLinkedProduct\Plugin\Hyva\Theme\ViewModel\Slider"/>
+    </type>
+    <type name="Hyva\Theme\ViewModel\ProductListItem">
+        <plugin name="sutunam_hyva_linked_product_get_item_cache_key_info"
+                type="Sutunam\HyvaLinkedProduct\Plugin\Hyva\Theme\ViewModel\ProductListItem"/>
+    </type>
+</config>

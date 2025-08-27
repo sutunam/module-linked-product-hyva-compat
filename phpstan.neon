@@ -1,0 +1,11 @@
+parameters:
+	level: 5
+	paths:
+		- ./src
+	bootstrapFiles:
+	    - vendor/autoload.php
+	excludePaths:
+	    - 'vendor/*'
+	    - 'src/Plugin/Hyva/Theme/ViewModel/Slider.php'
+	    - 'src/Plugin/Hyva/Theme/ViewModel/ProductListItem.php'
+	    - 'generated/*'

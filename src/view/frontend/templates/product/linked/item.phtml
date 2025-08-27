@@ -1,0 +1,97 @@
+<?php
+/**
+ * @author    Sutunam
+ * @copyright Copyright (c) 2024 Sutunam (http://www.sutunam.com/)
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\CurrentProduct;
+use Magento\Catalog\Block\Product\AbstractProduct;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Sutunam\LinkedProduct\Model\Config as ConfigData;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var AbstractProduct $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var CurrentProduct $currentProductViewModel */
+$currentProductViewModel = $viewModels->require(CurrentProduct::class);
+
+/** @var ConfigData $configData */
+$configData = $this->helper(ConfigData::class);
+
+/** @var Magento\Catalog\Model\Product $product */
+$product = $block->getData('product');
+
+if (!$product) {
+    return;
+}
+
+$attributeToLink = $product->getData('attribute_to_link');
+
+if (!$attributeToLink) {
+    return;
+}
+
+$currentProduct = $currentProductViewModel->exists() ? $currentProductViewModel->get() : null;
+$isActiveProduct = $currentProduct && $currentProduct->getId() === $product->getId();
+
+$showAttributeText = $configData->isShowAttributeText();
+$showStockStatus = $configData->isShowStockStatus();
+
+$showStockStatusText = $block->getData('show_stock_status_text');
+$imageDisplayArea = $block->getData('image_display_area');
+$imageCustomAttributes = $product->getData('image_custom_attributes')
+    ?? $block->getData('image_custom_attributes')
+    ?? [];
+?>
+<a href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>"
+   class="product photo product-item-photo block w-20 group "
+   tabindex="-1"
+    <?= !$isActiveProduct ?: '@click.prevent' ?>
+    <?php if ($isActiveProduct): ?> id="linked-product-active" <?php endif ?>
+>
+    <div class="item product product-item flex flex-col items-center w-full">
+        <?php $borderClass = $isActiveProduct ? 'border-neutral-5 active' : 'border-transparent custom-background' ?>
+        <div class="h-20 w-20 rounded-lg overflow-hidden border transition-all duration-300
+        <?= $escaper->escapeHtmlAttr($borderClass) ?> group-hover:border-neutral-4">
+            <?= $block->getImage($product, $imageDisplayArea)
+                ->setTemplate('Sutunam_HyvaLinkedProduct::product/linked/image.phtml')
+                ->setData('custom_attributes', $imageCustomAttributes)
+                ->setProductId($product->getId())
+                ->toHtml(); ?>
+        </div>
+        <div class="product-info flex flex-col grow w-full">
+            <div class="mt-auto pt-2 flex flex-wrap justify-center items-center">
+                <?php $textClass = $isActiveProduct ? 'text-neutral-7' : 'text-neutral-5' ?>
+                <div class="w-full flex  gap-x-1 text-xs capitalize mr-auto transition-all duration-300
+                <?= $escaper->escapeHtmlAttr($textClass) ?> product-color-name group-hover:text-neutral-7 overflow-x-hidden">
+                    <?php if (!$product->getIsSalable()): ?>
+                        <span class="w-2 h-2 inline-block bg-tertiary-1 rounded-full shrink-0 mt-1"></span>
+                    <?php endif; ?>
+
+                    <?php if ($product->getIsSalable()): ?>
+                        <?php if ($showAttributeText): ?>
+                            <span class="w-full">
+                                 <?= $escaper->escapeHtml($product->getAttributeText($attributeToLink)) ?>
+                            </span>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <?php if ($showAttributeText): ?>
+                            <span class="transition-all duration-300 group-hover:text-neutral-7 text-neutral-4 w-[calc(100%-10px)]">
+                                <?= $escaper->escapeHtml($product->getAttributeText($attributeToLink)) ?>
+                            </span>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</a>

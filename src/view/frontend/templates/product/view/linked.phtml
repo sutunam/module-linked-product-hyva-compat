@@ -1,0 +1,100 @@
+<?php
+/**
+ * @author    Sutunam
+ * @copyright Copyright (c) 2024 Sutunam (http://www.sutunam.com/)
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductListItem;
+use Hyva\Theme\ViewModel\Store;
+use Magento\Catalog\Block\Product\AbstractProduct;
+use Magento\Catalog\Model\Product\Visibility as ProductVisibility;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Sutunam\LinkedProduct\Model\Config as ConfigData;
+use Sutunam\LinkedProduct\ViewModel\ProductList;
+use Magento\Catalog\Block\Product\View;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var View $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var ConfigData $configData */
+$configData = $this->helper(ConfigData::class);
+
+/** @var ProductListItem $productListItemViewModel */
+$productListItemViewModel = $viewModels->require(ProductListItem::class);
+
+/** @var ProductList $productListViewModel */
+$productListViewModel = $viewModels->require(ProductList::class);
+
+/** @var Store $storeViewModel */
+$storeViewModel = $viewModels->require(Store::class);
+
+if (!$configData->isEnable() || !$configData->isShowOnProductView()) {
+    return;
+}
+
+$showStockStatusText = $configData->isStockStatusTextProductView();
+
+$productListViewModel->addFilter('website_id', $storeViewModel->getWebsiteId());
+$productListViewModel->addFilter('visibility', [
+    ProductVisibility::VISIBILITY_IN_CATALOG,
+    ProductVisibility::VISIBILITY_BOTH,
+], 'in');
+
+$linkedProducts = $productListViewModel->getLinkedItems([$block->getProduct()]);
+
+if (count($linkedProducts) < 1) {
+    return;
+}
+
+// Current product
+$product = $block->getProduct();
+
+// Add the current product to the linked products list
+array_unshift($linkedProducts, $product);
+
+$attributeOptions = $productListViewModel->getOptionsSortOrder();
+$attributeToLink = $product->getData('attribute_to_link');
+
+// Sort linked products by attribute value order
+usort($linkedProducts, function ($a, $b) use ($attributeOptions, $attributeToLink) {
+    if (!isset($attributeOptions[$a->getData($attributeToLink)]) ||
+        !isset($attributeOptions[$b->getData($attributeToLink)])
+    ) {
+        return 1;
+    }
+
+    $sortOrderA = (int)$attributeOptions[$a->getData($attributeToLink)];
+    $sortOrderB = (int)$attributeOptions[$b->getData($attributeToLink)];
+
+    return $sortOrderA <=> $sortOrderB;
+});
+
+/** @var Template $itemRendererBlock */
+$itemRendererBlock = $block->getLayout()->createBlock(AbstractProduct::class);
+$itemRendererBlock->setTemplate('Sutunam_HyvaLinkedProduct::product/linked/item.phtml');
+$itemRendererBlock->setData('show_stock_status_text', $showStockStatusText);
+?>
+<div class="mb-4">
+    <div class="flex gap-3 pb-4">
+        <?php foreach ($linkedProducts as $linkedProduct): ?>
+            <?= $productListItemViewModel->getItemHtmlWithRenderer(
+                $itemRendererBlock,
+                $linkedProduct,
+                $block,
+                'grid',
+                'short',
+                'product_page_linked_product',
+                false
+            ) ?>
+        <?php endforeach; ?>
+    </div>
+</div>
