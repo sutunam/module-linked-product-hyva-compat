@@ -22,24 +22,13 @@ Currently, there are no additional configuration options beyond enabling the mod
 
 ### Install via Composer
 
-1. Add the Sutunam Composer repository:
-
-```json
-"repositories": {
-    "sutunam": {
-        "type": "composer",
-        "url": "https://composer.sutunam.com/m2/"
-    }
-}
-```
-
-2. Require the module:
+1. Require the module:
 
 ```bash
 composer require sutunam/hyva-linked-product
 ```
 
-3. Enable and upgrade the module:
+2. Enable and upgrade the module:
 
 ```bash
 bin/magento module:enable Sutunam_HyvaLinkedProduct
@@ -47,7 +36,7 @@ bin/magento setup:upgrade
 bin/magento cache:flush
 ```
 
-4. For production mode:
+3. For production mode:
 
 ```bash
 bin/magento setup:di:compile
@@ -57,6 +46,11 @@ bin/magento setup:static-content:deploy -f
 ---
 
 ## 📝 Changelog
+
+### 1.0.3
+
+* Remove .gitlab-ci.yml to use the same one as other modules
+* Update license
 
 ### 1.0.2
 
@@ -77,3 +71,9 @@ bin/magento setup:static-content:deploy -f
 * Fully compatible with Hyvä theme.
 * No additional configuration is needed for basic usage.
 * Designed to improve product discoverability and enhance the shopping experience.
+
+## Development by Sutunam
+
+We are an Open Source Software Development Company, specialized in Magento 2 and [Hyva Silver Partner](https://en.sutunam.vn/solutions/hyva-specialists-magento-experts/)
+
+[Contact us](https://en.sutunam.vn/contact/)
