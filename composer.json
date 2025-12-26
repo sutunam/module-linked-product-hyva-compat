@@ -2,10 +2,10 @@
     "name": "sutunam/hyva-linked-product",
     "description": "Hyva Compat For Sutunam Linked Product Module",
     "type": "magento2-module",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "require": {
         "magento/framework": "*",
-        "sutunam/module-base": "*",
+        "sutunam/module-base": "^2.0",
         "sutunam/module-linked-product": "*"
     },
     "license": [

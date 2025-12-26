@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.5]
+
+### Changed
+
+-   Require a new version of the base module.
+
 ## [1.0.4]
 
 ### Changed
